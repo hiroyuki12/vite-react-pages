@@ -56,35 +56,29 @@ function App() {
     //setTag('Swift');
   }
 
-  // QiitaAPIを叩く
-  const handleClick = () => {
+  const handleClick = (target) => {
+    const limit = 20;
+    const url = `https://qiita.com/api/v2/tags/${tag}/items?page=${page}&per_page=${limit}`;
     setIsLoading(true);
 
-    //axios.get(APIのエンドポイント,パラメータの引数)
-    axios.get('https://qiita.com/api/v2/items', {
-        params: {
-          "page": page,
-          "per_page": "20",
-          "query": tag,
+    const headers = {}
+    fetch(url, { headers })
+      .then(res =>
+        res.json().then(data => ({
+          ok: res.ok,
+          data,
+        }))
+      )
+      .then(res => {
+        if (!res.ok) {
+          setError(res.data.message);
+          setIsLoading(false);
+          //throw Error(res.data.message)
+        } else {
+          setPostsList(postsList.concat(res.data));
+          setIsLoading(false);
         }
       })
-      // response にAPIからのレスポンスが格納される
-      .then((response) => {
-        // data にレスポンスから帰ってきた記事の情報を格納
-        setPostsList(postsList.concat(response.data));
-        setIsLoading(false);
-        setError('');
-        // コンソールから response と title と url を確認
-        console.debug(response, "ressponse");
-        //console.debug(title, "title")
-        //console.debug(url, "url")
-      })
-      .catch((error) => {
-        setIsLoading(false);
-        setError('Rate limit exceeded');
-        //setError(error.message);
-        console.debug(error);
-      });
   }
 
   // page + 1 
