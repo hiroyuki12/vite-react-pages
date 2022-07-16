@@ -6,10 +6,10 @@ import moment from 'moment';
 import '../QiitaApp.css';
 
 function App() {
-  const [query, setQuery] = useState('React');
   const [page, setPage] = useState(1);
   const [postsList, setPostsList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [tag, setTag] = useState('React');
 
   // 一番下に到達したら getQiitaPosts()でページを更新
   const handleScroll = lodash.throttle(() => {
@@ -42,6 +42,19 @@ function App() {
     // eslint-disable-next-line
   }, [page]); // Only re-run the effect if count changes
 
+  // tagが変化した時に実行
+  useEffect(() => {
+    //document.title = `page = ${page}, message = ${message}`;
+    getQiitaPosts();
+    // eslint-disable-next-line
+  }, [tag]); // Only re-run the effect if count changes
+
+  const tagButtonClick = (target) => {
+    setPostsList([]);
+    setTag(target);
+    //setTag('Swift');
+  }
+
   // QiitaAPIを叩く
   const getQiitaPosts = () => {
     setIsLoading(true);
@@ -51,7 +64,7 @@ function App() {
         params: {
           "page": page,
           "per_page": "20",
-          "query": query,
+          "query": tag,
         }
       })
       // response にAPIからのレスポンスが格納される
@@ -99,10 +112,18 @@ function App() {
           <a className="QiitaApp-link" href="https://mbp.hatenablog.com/entry/2022/07/16/103717" target="_blank" rel="noreferrer">netlifyでVite React App、QiitaAPIから記事情報を取得して表示</a><br />
           <a className="QiitaApp-link" href="https://mbp.hatenablog.com/entry/2022/07/14/225626" target="_blank" rel="noreferrer">Vite で React 新規プロジェクトを作成</a><br />
           <h3>QiitaでReactタグありの記事を表示</h3>
-
+          <br />
+          <button onClick={() => {tagButtonClick("react")}}>react</button>
+          <button onClick={() => {tagButtonClick("swift")}}>swift</button>
+          <button onClick={() => {tagButtonClick("vim")}}>vim</button>
+          <button onClick={() => {tagButtonClick("azure")}}>azure</button>
+          <button onClick={() => {tagButtonClick("aws")}}>aws</button>
+          <button onClick={() => {tagButtonClick(".NET")}}>.NET</button>
+          <button onClick={() => {tagButtonClick("Flutter")}}>Flutter</button>
+          {tag}
           <ul>{renderImageList(postsList)}</ul>
 
-          Page {page}, tag {query}, {isLoading}
+          Page {page}, tag {tag}, {isLoading}
           <br />
           {isLoading ? (
             <>Loading .... </>
