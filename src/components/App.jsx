@@ -31,7 +31,7 @@ function App() {
       // response にAPIからのレスポンスが格納される
       .then((response) => {
         // data にレスポンスから帰ってきた記事の情報を格納
-        setPostsList(response.data);
+        setPostsList(postsList.concat(response.data));
         setIsLoading(false);
         // コンソールから response と title と url を確認
         console.debug(response, "ressponse");
