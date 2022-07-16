@@ -29,37 +29,7 @@ class App extends Component {
       // response にAPIからのレスポンスが格納される
       .then((response) => {
         // data にレスポンスから帰ってきた1つ目の記事の情報を格納
-        const data = response.data[0];
-        const data1 = response.data[1];
-        const data2 = response.data[2];
-        const data3 = response.data[3];
-        const data4 = response.data[4];
         this.setState({
-          title: data.title,
-          url: data.url,
-          profile: data.user.profile_image_url,
-          created_at: data.created_at,
-
-          title1: data1.title,
-          url1: data1.url,
-          profile1: data1.user.profile_image_url,
-          created_at1: data1.created_at,
-
-          title2: data2.title,
-          url2: data2.url,
-          profile2: data2.user.profile_image_url,
-          created_at2: data2.created_at,
-
-          title3: data3.title,
-          url3: data3.url,
-          profile3: data3.user.profile_image_url,
-          created_at3: data3.created_at,
-
-          title4: data4.title,
-          url4: data4.url,
-          profile4: data4.user.profile_image_url,
-          created_at4: data4.created_at,
-
           postsList: response.data,
         });
         // コンソールから response と title と url を確認
@@ -91,8 +61,8 @@ class App extends Component {
     const posts = list.map((item, index) => {
       return (
         <li className="item" key={index}>
-          <span>{index}: </span>
-          <a href={item.url}>{item.title}</a>
+          <img src={item.user.profile_image_url} width="50" height="50" loading="lazy" alt="img" />
+          <a className="QiitaApp-link" href={item.url} target="_blank" rel="noreferrer">{item.title}</a> {moment(item.created_at).fromNow()}
         </li>
       );
     });
@@ -104,26 +74,7 @@ class App extends Component {
     return (
       <div className="App">
         <h1 className="app-title">Hello Qiita API</h1>
-        <li className="item">
-          <img src={this.state.profile} width="50" height="50" loading="lazy" alt="img" />
-          <a className="QiitaApp-link" href={this.state.url} target="_blank" rel="noreferrer">{this.state.title}</a> {moment(this.state.created_at).fromNow()}
-        </li>
-        <li className="item">
-          <img src={this.state.profile1} width="50" height="50" loading="lazy" alt="img" />
-          <a className="QiitaApp-link" href={this.state.url1} target="_blank" rel="noreferrer">{this.state.title1}</a> {moment(this.state.created_at1).fromNow()}
-        </li>
-        <li className="item">
-          <img src={this.state.profile2} width="50" height="50" loading="lazy" alt="img" />
-          <a className="QiitaApp-link" href={this.state.url2} target="_blank" rel="noreferrer">{this.state.title2}</a> {moment(this.state.created_at2).fromNow()}
-        </li>
-        <li className="item">
-          <img src={this.state.profile3} width="50" height="50" loading="lazy" alt="img" />
-          <a className="QiitaApp-link" href={this.state.url3} target="_blank" rel="noreferrer">{this.state.title3}</a> {moment(this.state.created_at3).fromNow()}
-        </li>
-        <li className="item">
-          <img src={this.state.profile4} width="50" height="50" loading="lazy" alt="img" />
-          <a className="QiitaApp-link" href={this.state.url4} target="_blank" rel="noreferrer">{this.state.title4}</a> {moment(this.state.created_at4).fromNow()}
-        </li>
+        <ul>{this.renderImageList(this.state.postsList)}</ul>
         <input
           type="button"
           value="検索"
@@ -140,7 +91,6 @@ class App extends Component {
           onClick={() => this.getBeforeQiitaPosts()}
         />
         Page {this.state.page}, tag {this.state.query}
-        <ul>{this.renderImageList(this.state.postsList)}</ul>
       </div>
     )
   }
