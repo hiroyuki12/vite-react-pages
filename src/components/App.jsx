@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 // axiosをインポート
 import axios from 'axios';
+import lodash from 'lodash';
 import moment from 'moment';
 
 function App() {
@@ -8,6 +9,30 @@ function App() {
   const [page, setPage] = useState(1);
   const [postsList, setPostsList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  // 一番下に到達したら getQiitaPosts()でページを更新
+  const handleScroll = lodash.throttle(() => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop !==
+      document.documentElement.offsetHeight
+    ) {
+      return;
+    }
+
+    // 一番下に到達した時の処理
+    //if(message !== "loading...") {
+      setPage((prevCount) => prevCount + 1);
+    //}
+
+  }, 500);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // pageが変化した時に実行
   useEffect(() => {
