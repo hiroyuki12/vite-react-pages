@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import lodash from 'lodash';
 import moment from 'moment';
+import '../QiitaApp.css';
 
 function App() {
   const [query, setQuery] = useState('React');
@@ -94,30 +95,19 @@ function App() {
   // 表示されるHTMLを記述
     return (
       <div className="App">
-        <h1 className="app-title">Hello Qiita API</h1>
-        <ul>{renderImageList(postsList)}</ul>
-        <input
-          type="button"
-          value="検索"
-          onClick={() => {getQiitaPosts()}}
-        />
-        <input
-          type="button"
-          value="+1"
-          onClick={() => {getNextQiitaPosts()}}
-        />
-        <input
-          type="button"
-          value="-1"
-          onClick={() => {getBeforeQiitaPosts()}}
-        />
-        Page {page}, tag {query}, {isLoading}
-        <br />
-        {isLoading ? (
-          <>Loading .... </>
-        ) : (
-          <>Not Loading. </>
-        )}
+        <header className="QiitaApp-header">
+          <h3>QiitaでReactタグありの記事を表示</h3>
+
+          <ul>{renderImageList(postsList)}</ul>
+
+          Page {page}, tag {query}, {isLoading}
+          <br />
+          {isLoading ? (
+            <>Loading .... </>
+          ) : (
+            <>Not Loading. </>
+          )}
+        </header>
       </div>
     )
 }
