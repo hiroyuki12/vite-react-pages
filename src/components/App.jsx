@@ -130,9 +130,9 @@ function App() {
           Page {page}, tag {tag}, {isLoading}
           <br />
           {isLoading ? (
-            <>Loading .... </>
+            <>Loading .... page: {page}/20posts/{20*(page-1)+1}-</>
           ) : (
-            <>Not Loading. </>
+            <>Not Loading. page: {page}/20posts/{20*(page-1)+1}-</>
           )}
         </header>
       </div>
