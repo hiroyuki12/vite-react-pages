@@ -7,10 +7,12 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.getQiitaPosts = this.getQiitaPosts.bind(this);
+    this.renderImageList = this.renderImageList.bind(this);
     this.state = {
       // ここを`React`など検索したいワードに変えられる
       query: 'React',
-      page: 1
+      page: 1,
+      postsList: []
     }
   }
 
@@ -57,6 +59,8 @@ class App extends Component {
           url4: data4.url,
           profile4: data4.user.profile_image_url,
           created_at4: data4.created_at,
+
+          postsList: response.data,
         });
         // コンソールから response と title と url を確認
         console.debug(response, "ressponse");
@@ -82,6 +86,19 @@ class App extends Component {
       page: newPage 
     });
   }
+
+  renderImageList(list) {
+    const posts = list.map((item, index) => {
+      return (
+        <li className="item" key={index}>
+          <span>{index}: </span>
+          <a href={item.url}>{item.title}</a>
+        </li>
+      );
+    });
+    return posts;
+  }
+
   // 表示されるHTMLを記述
   render() {
     return (
@@ -122,7 +139,8 @@ class App extends Component {
           value="-1"
           onClick={() => this.getBeforeQiitaPosts()}
         />
-        {this.state.page}
+        Page {this.state.page}, tag {this.state.query}
+        <ul>{this.renderImageList(this.state.postsList)}</ul>
       </div>
     )
   }
