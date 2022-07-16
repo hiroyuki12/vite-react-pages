@@ -73,14 +73,16 @@ function App() {
         // data にレスポンスから帰ってきた記事の情報を格納
         setPostsList(postsList.concat(response.data));
         setIsLoading(false);
+        setError('');
         // コンソールから response と title と url を確認
         console.debug(response, "ressponse");
-        console.debug(title, "title")
-        console.debug(url, "url")
+        //console.debug(title, "title")
+        //console.debug(url, "url")
       })
       .catch((error) => {
         setIsLoading(false);
         setError('Rate limit exceeded');
+        //setError(error.message);
         console.debug(error);
       });
   }
