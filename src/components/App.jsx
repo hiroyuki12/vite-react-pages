@@ -9,6 +9,13 @@ function App() {
   const [postsList, setPostsList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  // pageが変化した時に実行
+  useEffect(() => {
+    //document.title = `page = ${page}, message = ${message}`;
+    getQiitaPosts();
+    // eslint-disable-next-line
+  }, [page]); // Only re-run the effect if count changes
+
   // QiitaAPIを叩く
   const getQiitaPosts = () => {
     setIsLoading(true);
