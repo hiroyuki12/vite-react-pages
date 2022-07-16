@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useEffect } from 'react';
 // axiosをインポート
 import axios from 'axios';
 import moment from 'moment';
@@ -12,12 +12,16 @@ class App extends Component {
       // ここを`React`など検索したいワードに変えられる
       query: 'React',
       page: 1,
-      postsList: []
+      postsList: [],
+      isLoading: false,
     }
   }
 
   // QiitaAPIを叩く
   getQiitaPosts() {
+    this.setState({
+      isLoading: true,
+    });
     //axios.get(APIのエンドポイント,パラメータの引数)
     axios.get('https://qiita.com/api/v2/items', {
         params: {
@@ -31,6 +35,7 @@ class App extends Component {
         // data にレスポンスから帰ってきた1つ目の記事の情報を格納
         this.setState({
           postsList: response.data,
+          isLoading: false,
         });
         // コンソールから response と title と url を確認
         console.debug(response, "ressponse");
@@ -90,7 +95,13 @@ class App extends Component {
           value="-1"
           onClick={() => this.getBeforeQiitaPosts()}
         />
-        Page {this.state.page}, tag {this.state.query}
+        Page {this.state.page}, tag {this.state.query}, {this.isLoading}
+        <br />
+        {this.state.isLoading ? (
+          <>Loading .... </>
+        ) : (
+          <>Not Loading. </>
+        )}
       </div>
     )
   }
