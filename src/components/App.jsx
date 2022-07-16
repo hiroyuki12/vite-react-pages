@@ -11,7 +11,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [tag, setTag] = useState('React');
 
-  // 一番下に到達したら getQiitaPosts()でページを更新
+  // 一番下に到達したら handleClick()でページを更新
   const handleScroll = lodash.throttle(() => {
     if (
       window.innerHeight + document.documentElement.scrollTop !==
@@ -38,14 +38,14 @@ function App() {
   // pageが変化した時に実行
   useEffect(() => {
     //document.title = `page = ${page}, message = ${message}`;
-    getQiitaPosts();
+    handleClick();
     // eslint-disable-next-line
   }, [page]); // Only re-run the effect if count changes
 
   // tagが変化した時に実行
   useEffect(() => {
     //document.title = `page = ${page}, message = ${message}`;
-    getQiitaPosts();
+    handleClick();
     // eslint-disable-next-line
   }, [tag]); // Only re-run the effect if count changes
 
@@ -56,7 +56,7 @@ function App() {
   }
 
   // QiitaAPIを叩く
-  const getQiitaPosts = () => {
+  const handleClick = () => {
     setIsLoading(true);
 
     //axios.get(APIのエンドポイント,パラメータの引数)
