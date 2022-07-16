@@ -1,46 +1,35 @@
-import React, { Component, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 // axiosをインポート
 import axios from 'axios';
 import moment from 'moment';
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.getQiitaPosts = this.getQiitaPosts.bind(this);
-    this.renderImageList = this.renderImageList.bind(this);
-    this.state = {
-      // ここを`React`など検索したいワードに変えられる
-      query: 'React',
-      page: 1,
-      postsList: [],
-      isLoading: false,
-    }
-  }
+function App() {
+  const [query, setQuery] = useState('React');
+  const [page, setPage] = useState(1);
+  const [postsList, setPostsList] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   // QiitaAPIを叩く
-  getQiitaPosts() {
-    this.setState({
-      isLoading: true,
-    });
+  const getQiitaPosts = () => {
+    setIsLoading(true);
+
     //axios.get(APIのエンドポイント,パラメータの引数)
     axios.get('https://qiita.com/api/v2/items', {
         params: {
-          "page": this.state.page,
+          "page": page,
           "per_page": "20",
-          "query": this.state.query,
+          "query": query,
         }
       })
       // response にAPIからのレスポンスが格納される
       .then((response) => {
-        // data にレスポンスから帰ってきた1つ目の記事の情報を格納
-        this.setState({
-          postsList: response.data,
-          isLoading: false,
-        });
+        // data にレスポンスから帰ってきた記事の情報を格納
+        setPostsList(response.data);
+        setIsLoading(false);
         // コンソールから response と title と url を確認
         console.debug(response, "ressponse");
-        console.debug(this.state.title, "title")
-        console.debug(this.state.url, "url")
+        console.debug(title, "title")
+        console.debug(url, "url")
       })
       .catch((error) => {
         console.debug(error);
@@ -48,21 +37,17 @@ class App extends Component {
   }
 
   // page + 1 
-  getNextQiitaPosts() {
-    const newPage = this.state.page + 1;
-    this.setState({
-      page: newPage 
-    });
+  const getNextQiitaPosts = () => {
+    const newPage = page + 1;
+    setPage(newPage);
   }
   // page - 1
-  getBeforeQiitaPosts() {
-    const newPage = this.state.page - 1;
-    this.setState({
-      page: newPage 
-    });
+  const getBeforeQiitaPosts = () => {
+    const newPage = page - 1;
+    setPage(newPage);
   }
 
-  renderImageList(list) {
+  const renderImageList = (list) => {
     const posts = list.map((item, index) => {
       return (
         <li className="item" key={index}>
@@ -75,36 +60,34 @@ class App extends Component {
   }
 
   // 表示されるHTMLを記述
-  render() {
     return (
       <div className="App">
         <h1 className="app-title">Hello Qiita API</h1>
-        <ul>{this.renderImageList(this.state.postsList)}</ul>
+        <ul>{renderImageList(postsList)}</ul>
         <input
           type="button"
           value="検索"
-          onClick={() => this.getQiitaPosts()}
+          onClick={() => {getQiitaPosts()}}
         />
         <input
           type="button"
           value="+1"
-          onClick={() => this.getNextQiitaPosts()}
+          onClick={() => {getNextQiitaPosts()}}
         />
         <input
           type="button"
           value="-1"
-          onClick={() => this.getBeforeQiitaPosts()}
+          onClick={() => {getBeforeQiitaPosts()}}
         />
-        Page {this.state.page}, tag {this.state.query}, {this.isLoading}
+        Page {page}, tag {query}, {isLoading}
         <br />
-        {this.state.isLoading ? (
+        {isLoading ? (
           <>Loading .... </>
         ) : (
           <>Not Loading. </>
         )}
       </div>
     )
-  }
 }
 
 export default App;
