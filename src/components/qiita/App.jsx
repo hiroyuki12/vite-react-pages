@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import lodash from 'lodash';
 import moment from 'moment';
-import '../QiitaApp.css';
+import '../../QiitaApp.css';
 
 function App() {
   const [page, setPage] = useState(1);
