@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import lodash from 'lodash';
 import moment from 'moment';
-import '../../QiitaApp.css';
+import './QiitaApp.css';
 
 function App() {
   const [page, setPage] = useState(1);
@@ -109,7 +109,7 @@ function App() {
       <div className="App">
         <header className="QiitaApp-header">
           <font color="red"><b>{error}</b></font><br />
-          <a className="QiitaApp-link" href="https://mbp.hatenablog.com/entry/2022/07/16/103717" target="_blank" rel="noreferrer">netlifyでVite React App、QiitaAPIから記事情報を取得して表示</a><br />
+          <a className="QiitaApp-link" href="https://mbp.hatenablog.com/entry/2022/07/16/103717" target="_blank" rel="noreferrer">netlifyでVite React App、QiitaAPIから記事情報を取得して表示(vite-react-pages)</a><br />
           <a className="QiitaApp-link" href="https://mbp.hatenablog.com/entry/2022/07/14/225626" target="_blank" rel="noreferrer">Vite で React 新規プロジェクトを作成</a><br />
           <h3>QiitaでReactタグありの記事を表示</h3>
           <br />
