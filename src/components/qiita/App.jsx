@@ -96,8 +96,15 @@ function App() {
     const posts = list.map((item, index) => {
       return (
         <li className="item" key={index}>
-          <img src={item.user.profile_image_url} width="50" height="50" loading="lazy" alt="img" />
-          <a className="QiitaApp-link" href={item.url} target="_blank" rel="noreferrer">{item.title}</a> {moment(item.created_at).fromNow()}
+          <div class="card-container">
+            <img src={item.user.profile_image_url} width="50" height="50" loading="lazy" alt="img" />
+            <div class="card-text">
+              <a className="QiitaApp-link" href={item.url} target="_blank" rel="noreferrer">{item.title}</a>
+              <div class="card-text2">
+                <p>{moment(item.created_at).fromNow()}</p>
+              </div>
+            </div>
+          </div>
         </li>
       );
     });

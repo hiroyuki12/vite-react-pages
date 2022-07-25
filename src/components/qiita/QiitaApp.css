@@ -2,14 +2,28 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-size: 14px;
 }
 
 .QiitaApp-header {
   background-color: #282c34;
   color: orange;
+  font-size: 14px;
 }
 
 .QiitaApp-link {
   color: white;
+}
+
+.card-container{
+  display: flex;
+  height: 34px;
+}
+
+.card-text a{
+  color: white;
+  font-size: 14px;
+}
+
+.card-text2{
+  font-size: 12px;
 }
