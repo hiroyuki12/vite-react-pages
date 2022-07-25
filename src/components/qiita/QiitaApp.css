@@ -22,8 +22,14 @@
 .card-text a{
   color: white;
   font-size: 14px;
+  line-height: 1.2em;
+
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .card-text2{
-  font-size: 12px;
+  font-size: 11px;
 }
