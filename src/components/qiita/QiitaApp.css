@@ -16,13 +16,14 @@
 
 .card-container{
   display: flex;
-  height: 34px;
+  height: 38px;
 }
 
 .card-text a{
   color: white;
   font-size: 14px;
   line-height: 1.2em;
+  height: 30px;
 
   overflow: hidden;
   display: -webkit-box;
