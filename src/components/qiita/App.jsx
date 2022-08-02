@@ -56,6 +56,13 @@ function App() {
     //setTag('Swift');
   }
 
+  const pageButtonClick = (target) => {
+    setPostsList([]);
+    const tmp = parseInt(target,10);
+    setPage(tmp);
+    //setTag('Swift');
+  }
+
   const handleClick = (target) => {
     const limit = 20;
     const url = `https://qiita.com/api/v2/tags/${tag}/items?page=${page}&per_page=${limit}`;
@@ -140,7 +147,11 @@ function App() {
           <button onClick={() => {tagButtonClick("aws")}}>AWS</button>
           <button onClick={() => {tagButtonClick(".NET")}}>.NET</button>
           <button onClick={() => {tagButtonClick("Flutter")}}>Flutter</button>
-          {tag}
+          {tag}<br />
+          page:<button onClick={() => {pageButtonClick("1")}}>__1__</button>
+          ___:<button onClick={() => {pageButtonClick("10")}}>__10__</button>
+          ___:<button onClick={() => {pageButtonClick("50")}}>__50__</button>
+          {page}
           <ul>{renderImageList(postsList)}</ul>
 
           Page {page}, tag {tag}, {isLoading}
