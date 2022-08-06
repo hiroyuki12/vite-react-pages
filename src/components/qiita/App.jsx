@@ -135,16 +135,16 @@ function App() {
           <font color="red"><b>{error}</b></font><br />
           <a className="QiitaApp-link" href="https://mbp.hatenablog.com/entry/2022/07/16/103717" target="_blank" rel="noreferrer">netlifyでVite React App、QiitaAPIから記事情報を取得して表示(vite-react-pages)</a><br />
           <a className="QiitaApp-link" href="https://mbp.hatenablog.com/entry/2022/07/14/225626" target="_blank" rel="noreferrer">Vite で React 新規プロジェクトを作成</a><br />
-          <h3>QiitaでReactタグありの記事を表示2</h3>
+          <h3>QiitaでReactタグありの記事を表示</h3>
           <br />
-          <button onClick={() => {tagButtonClick("react")}}>React</button>
-          <button onClick={() => {tagButtonClick("next.js")}}>Next.js</button>
-          <button onClick={() => {tagButtonClick("vue.js")}}>Vue.js</button>
-          <button onClick={() => {tagButtonClick("nuxt")}}>Nuxt.js</button>
-          <button onClick={() => {tagButtonClick("swift")}}>Swift</button>
-          <button onClick={() => {tagButtonClick("vim")}}>Vim</button>
-          <button onClick={() => {tagButtonClick("azure")}}>Azure</button>
-          <button onClick={() => {tagButtonClick("aws")}}>AWS</button>
+          <button onClick={() => {tagButtonClick("React")}}>React</button>
+          <button onClick={() => {tagButtonClick("Next.js")}}>Next.js</button>
+          <button onClick={() => {tagButtonClick("Vue.js")}}>Vue.js</button>
+          <button onClick={() => {tagButtonClick("Nuxt")}}>Nuxt.js</button>
+          <button onClick={() => {tagButtonClick("Swift")}}>Swift</button>
+          <button onClick={() => {tagButtonClick("Vim")}}>Vim</button>
+          <button onClick={() => {tagButtonClick("Azure")}}>Azure</button>
+          <button onClick={() => {tagButtonClick("Aws")}}>AWS</button>
           <button onClick={() => {tagButtonClick(".NET")}}>.NET</button>
           <button onClick={() => {tagButtonClick("Flutter")}}>Flutter</button>
           {tag}<br />
@@ -162,6 +162,7 @@ function App() {
             <>Not Loading. page: {page}/20posts/{20*(page-1)+1}-</>
           )}
         </header>
+        <div className="QiitaApp-footer">{tag} Page {page}/20posts/{20*(page-1)+1}-</div>
       </div>
     )
 }
