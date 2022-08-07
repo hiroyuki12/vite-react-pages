@@ -117,7 +117,7 @@ function App() {
             <div class="card-text">
               <a className="QiitaApp-link" href={item.url} target="_blank" rel="noreferrer">{item.title}</a>
               <div class="card-text2">
-                <p>{moment(item.created_at).fromNow()}  
+                <p>{moment(item.created_at).fromNow(true)}
                    / {renderTag(item.tags)} / {item.likes_count}likes / {item.user.items_count}posts</p>
               </div>
             </div>
