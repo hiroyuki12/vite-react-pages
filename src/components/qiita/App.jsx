@@ -140,7 +140,7 @@ function App() {
           <button onClick={() => {tagButtonClick("React")}}>React</button>
           <button onClick={() => {tagButtonClick("Next.js")}}>Next.js</button>
           <button onClick={() => {tagButtonClick("Vue.js")}}>Vue.js</button>
-          <button onClick={() => {tagButtonClick("Nuxt")}}>Nuxt.js</button>
+          <button onClick={() => {tagButtonClick("Nuxt.js")}}>Nuxt.js</button>
           <button onClick={() => {tagButtonClick("Swift")}}>Swift</button>
           <button onClick={() => {tagButtonClick("Vim")}}>Vim</button>
           <button onClick={() => {tagButtonClick("Azure")}}>Azure</button>
