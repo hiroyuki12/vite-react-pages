@@ -32,7 +32,8 @@
   color: white;
   font-size: 14px;
   line-height: 1.2em;
-  height: 30px;
+  height: 26px;
+  margin: 4px;
 
   overflow: hidden;
   display: -webkit-box;
@@ -42,6 +43,7 @@
 
 .card-text2{
   font-size: 11px;
+  margin: 4px;
 
   overflow: hidden;
   display: -webkit-box;
