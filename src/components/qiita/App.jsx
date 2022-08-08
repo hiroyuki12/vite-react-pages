@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 // axiosをインポート
 import axios from 'axios';
 import lodash from 'lodash';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+dayjs.extend(relativeTime);
 import './QiitaApp.css';
 
 function App() {
@@ -117,7 +119,7 @@ function App() {
             <div class="card-text">
               <a className="QiitaApp-link" href={item.url} target="_blank" rel="noreferrer">{item.title}</a>
               <div class="card-text2">
-                <p>{moment(item.created_at).fromNow(true)}
+                <p>{dayjs(item.created_at).fromNow(true)}
                    / {renderTag(item.tags)} / {item.likes_count}likes / {item.user.items_count}posts</p>
               </div>
             </div>
