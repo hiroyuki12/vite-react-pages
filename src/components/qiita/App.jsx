@@ -138,7 +138,7 @@ function App() {
           <font color="red"><b>{error}</b></font><br />
           <a className="QiitaApp-link" href="https://mbp.hatenablog.com/entry/2022/07/16/103717" target="_blank" rel="noreferrer">netlifyでVite React App、QiitaAPIから記事情報を取得して表示(vite-react-pages)</a><br />
           <a className="QiitaApp-link" href="https://mbp.hatenablog.com/entry/2022/07/14/225626" target="_blank" rel="noreferrer">Vite で React 新規プロジェクトを作成</a><br />
-          <h3>QiitaでReactタグありの記事を表示</h3>
+          <h3>QiitaでReactタグありの記事を表示2</h3>
           <br />
           <button onClick={() => {tagButtonClick("React")}}>React</button>
           <button onClick={() => {tagButtonClick("Next.js")}}>Next.js</button>
