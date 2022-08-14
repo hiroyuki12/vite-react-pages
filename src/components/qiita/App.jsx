@@ -54,6 +54,7 @@ function App() {
   }, [tag]); // Only re-run the effect if count changes
 
   const tagButtonClick = (target) => {
+    setPerPage(20);
     setPostsList([]);
     setTag(target);
     //setTag('Swift');
