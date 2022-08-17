@@ -56,8 +56,8 @@ function App() {
   const tagButtonClick = (target) => {
     setPerPage(20);
     setPostsList([]);
+    setPage(1);
     setTag(target);
-    //setTag('Swift');
   }
 
   const pageButtonClick = (target) => {
