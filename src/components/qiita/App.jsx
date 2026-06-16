@@ -141,6 +141,9 @@ function App() {
           <a className="QiitaApp-link" href="https://mbp.hatenablog.com/entry/2022/07/14/225626" target="_blank" rel="noreferrer">Vite で React 新規プロジェクトを作成</a><br />
           <h3>QiitaでReactタグありの記事を表示</h3>
           <br />
+          <button onClick={() => {tagButtonClick("Codex")}}>Codex</button>
+          <button onClick={() => {tagButtonClick("ClaudeCode")}}>ClaudeCode</button>
+          <button onClick={() => {tagButtonClick("Gemini")}}>Gemini</button>
           <button onClick={() => {tagButtonClick("React")}}>React</button>
           <button onClick={() => {tagButtonClick("Next.js")}}>Next.js</button>
           <button onClick={() => {tagButtonClick("Vue.js")}}>Vue.js</button>
