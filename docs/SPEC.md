@@ -100,7 +100,8 @@ Vue.js / Nuxt.js / Azure / AWS / Flutter のボタンは非表示です (コー�
 | `perPage` | `20` | 1 ページあたりの件数 |
 | `postsList` | `[]` | 表示中の記事 |
 | `isLoading` | `false` | 取得中かどうか |
-| `error` | `''` | API エラーのメッセージ |
+| `error` | `''` | 取得エラーのメッセージ |
+| `reloadKey` | `0` | ボタンを押すたびに 1 増やし、同じ条件でも再取得させるためのキー |
 
 ### 5.2 初期表示
 
@@ -110,24 +111,35 @@ Vue.js / Nuxt.js / Azure / AWS / Flutter のボタンは非表示です (コー�
 
 1. `perPage` を 20、`postsList` を空、`page` を 1、`tag` を押したボタンのタグに設定します。
 2. 見出し・タグ名表示・フッターが新しいタグに切り替わります。
-3. 新しいタグの 1 ページ目を取得して表示します。
+3. 新しいタグの 1 ページ目を取得して表示します。表示中と同じタグのボタンを押した場合も、取得し直します。
 
 ### 5.4 ページボタンを押したとき
 
 1. `perPage` を 100、`postsList` を空、`page` をボタンの数値 (1 / 20 / 50 / 90) に設定します。
-2. そのページを 100 件単位で取得して表示します。タグは変わりません。
+2. そのページを 100 件単位で取得して表示します。タグは変わりません。表示中と同じページのボタンを押した場合も、取得し直します。
 
 ### 5.5 無限スクロール
 
-- `scroll` イベント (500ms の throttle) で、`innerHeight + scrollTop === offsetHeight` (ページ最下部) になったら `page` を 1 増やします。
+- `scroll` イベント (500ms の throttle) で、`innerHeight + scrollTop >= offsetHeight - 100` (最下部から 100px 以内) になったら `page` を 1 増やします。
+- **読み込み中は `page` を増やしません。** これにより、ページが飛んだり記事が欠落したりしません。
 - `page` が変わると次のページを取得し、既存の一覧の末尾に追加します。
 
 ### 5.6 データ取得
 
-- 実行のきっかけ: `page` または `tag` が変わったとき (初回マウントを含む)
-- 取得中は `isLoading = true` になり、完了すると `false` に戻ります。
-- 成功 (HTTP 2xx): 取得した記事を `postsList` の末尾に追加します。
-- 失敗 (HTTP 2xx 以外): レスポンスの `message` を `error` に設定し、赤字で表示します。
+- 実行のきっかけ: `tag`・`page`・`perPage`・`reloadKey` のいずれかが変わったとき (初回マウントを含む)。1 つの `useEffect` で取得するので、条件が同時に変わっても API は 1 回だけ呼ばれます。
+- 開始時に `isLoading = true` にし、前回のエラー表示を消します (`error = ''`)。
+- 成功 (HTTP 2xx で、本文が配列): 取得した記事を `postsList` の末尾に追加し、`isLoading = false` にします。
+- 失敗: `error` にメッセージを設定して赤字で表示し、`isLoading = false` にします。
+
+| 失敗の種類 | 表示するメッセージ |
+|---|---|
+| HTTP 2xx 以外 (本文に `message` あり) | API の `message` (例: `Rate limit exceeded`) |
+| HTTP 2xx 以外 (本文が JSON でない) | `HTTP {ステータスコード}` |
+| 通信エラー・CORS エラー | ブラウザのエラーメッセージ (例: `Failed to fetch`) |
+| HTTP 2xx だが本文が配列でない | `Unexpected response from Qiita API` |
+
+- 条件が変わったり画面を離れたりしたときは、実行中のリクエストを `AbortController` で中断します。中断したリクエストの結果やエラーは画面に反映しません。そのため、タグを素早く切り替えても、前のタグの記事が混ざりません。
+- タグ名は `encodeURIComponent` でエンコードして URL に埋め込みます。
 
 ## 6. 外部 API 仕様
 
@@ -139,6 +151,7 @@ Vue.js / Nuxt.js / Azure / AWS / Flutter のボタンは非表示です (コー�
 
 | 項目 | 型 | 用途 |
 |---|---|---|
+| `id` | string | 一覧の `key` |
 | `title` | string | タイトル |
 | `url` | string | 記事へのリンク |
 | `created_at` | string (ISO 8601) | 経過時間の表示 |
@@ -147,8 +160,8 @@ Vue.js / Nuxt.js / Azure / AWS / Flutter のボタンは非表示です (コー�
 | `user.profile_image_url` | string | アバター画像 |
 | `user.items_count` | number | 投稿者の記事数 |
 
-- エラーレスポンス (型: `QiitaErrorResponse`): `{ "message": string }`
-- 成功と失敗の判別: `parseQiitaResponse` が `res.ok` を見て `QiitaResult` (判別可能なユニオン型) に変換します。
+- エラーレスポンス (型: `QiitaErrorResponse`): `{ "message"?: string }`
+- レスポンスの解釈: `parseQiitaResponse` が、成功時は記事の配列 (`QiitaItem[]`) を返し、失敗時は `Error` を投げます (5.6 の表を参照)。
 
 ### 6.2 YouTube Data API v3 (未使用のサンプル)
 
@@ -190,10 +203,7 @@ Vue.js / Nuxt.js / Azure / AWS / Flutter のボタンは非表示です (コー�
 
 詳細と修正案は [code-review.md](./code-review.md) にあります。
 
-- タグを素早く切り替えると、前のタグの記事が表示されることがあります (レスポンスの競合)。
-- 通信エラー時に `Loading` のまま止まり、エラーも表示されません。
-- 一度表示したエラーメッセージが、成功後も消えません。
-- 初回表示時などに、同じ API を 2 回呼んでいます。
-- 無限スクロールで、読み込み中にページが飛び、記事が欠落することがあります。
+- レビューの高・中の指摘 (#1〜#6) は対応済みです。
+- 開発サーバー (`npm run dev`) では、React の StrictMode によって初回のリクエストが 2 回発生します。ただし 1 回目はすぐに中断されるので、表示には影響しません。本番ビルドでは 1 回です。
 - マニフェストが参照している `/icon-256x256.png` が `public/` にありません。
 - `Antigravity` と `Cloudflare` のタグが Qiita に存在するかは未確認です。存在しない場合、API はエラー (404) を返し、そのメッセージが赤字で表示される想定です。
