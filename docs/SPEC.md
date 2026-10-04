@@ -72,15 +72,13 @@ docs/                       仕様書とレビュー結果
 | 4 | Antigravity | `Antigravity` |
 | 5 | React | `React` |
 | 6 | Next.js | `Next.js` |
-| 7 | Vue.js | `Vue.js` |
-| 8 | Nuxt.js | `Nuxt.js` |
-| 9 | JavaScript | `JavaScript` |
-| 10 | Swift | `Swift` |
-| 11 | Vim | `Vim` |
-| 12 | Azure | `Azure` |
-| 13 | AWS | `Aws` |
-| 14 | .NET | `.NET` |
-| 15 | Flutter | `Flutter` |
+| 7 | JavaScript | `JavaScript` |
+| 8 | Swift | `Swift` |
+| 9 | Vim | `Vim` |
+| 10 | .NET | `.NET` |
+| 11 | Cloudflare | `Cloudflare` |
+
+Vue.js / Nuxt.js / Azure / AWS / Flutter のボタンは非表示です (コード上はコメントアウトで残してあります)。
 
 ### 4.3 記事カード
 
@@ -198,4 +196,4 @@ docs/                       仕様書とレビュー結果
 - 初回表示時などに、同じ API を 2 回呼んでいます。
 - 無限スクロールで、読み込み中にページが飛び、記事が欠落することがあります。
 - マニフェストが参照している `/icon-256x256.png` が `public/` にありません。
-- `Antigravity` タグが Qiita に存在するかは未確認です。存在しない場合、API はエラー (404) を返し、そのメッセージが赤字で表示される想定です。
+- `Antigravity` と `Cloudflare` のタグが Qiita に存在するかは未確認です。存在しない場合、API はエラー (404) を返し、そのメッセージが赤字で表示される想定です。

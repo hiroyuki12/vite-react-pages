@@ -174,15 +174,16 @@ function App() {
           <button onClick={() => {tagButtonClick("Antigravity")}}>Antigravity</button>
           <button onClick={() => {tagButtonClick("React")}}>React</button>
           <button onClick={() => {tagButtonClick("Next.js")}}>Next.js</button>
-          <button onClick={() => {tagButtonClick("Vue.js")}}>Vue.js</button>
-          <button onClick={() => {tagButtonClick("Nuxt.js")}}>Nuxt.js</button>
+          {/* <button onClick={() => {tagButtonClick("Vue.js")}}>Vue.js</button> */}
+          {/* <button onClick={() => {tagButtonClick("Nuxt.js")}}>Nuxt.js</button> */}
           <button onClick={() => {tagButtonClick("JavaScript")}}>JavaScript</button>
           <button onClick={() => {tagButtonClick("Swift")}}>Swift</button>
           <button onClick={() => {tagButtonClick("Vim")}}>Vim</button>
-          <button onClick={() => {tagButtonClick("Azure")}}>Azure</button>
-          <button onClick={() => {tagButtonClick("Aws")}}>AWS</button>
+          {/* <button onClick={() => {tagButtonClick("Azure")}}>Azure</button> */}
+          {/* <button onClick={() => {tagButtonClick("Aws")}}>AWS</button> */}
           <button onClick={() => {tagButtonClick(".NET")}}>.NET</button>
-          <button onClick={() => {tagButtonClick("Flutter")}}>Flutter</button>
+          {/* <button onClick={() => {tagButtonClick("Flutter")}}>Flutter</button> */}
+          <button onClick={() => {tagButtonClick("Cloudflare")}}>Cloudflare</button>
           {tag}<br />
           page:<button onClick={() => {pageButtonClick("1")}}>__1__</button>
           ___:<button onClick={() => {pageButtonClick("20")}}>__20__</button>
