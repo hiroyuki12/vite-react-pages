@@ -7,33 +7,24 @@ export default defineConfig({
   server: {
     open: true,
   },
-  plugins: [react(), VitePWA({
-      includeAssets: [
-        'offline.html',
-        'favicon.svg',
-        'favicon.ico',
-        'robots.txt',
-        'apple-touch-icon.png',
-      ],
+  plugins: [
+    react(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['vite.svg'],
       manifest: {
-        theme_color: '#000',
-        background_color: '#000',
+        theme_color: '#282c34',
+        background_color: '#282c34',
         display: 'standalone',
         scope: '/',
         start_url: '/',
-        short_name: 'Vite React App',
-        description:
-          'Vite React App',
-        name: 'Vite React App',
+        short_name: 'QiitaViewer',
+        description: 'Qiita タグ別記事ビューア',
+        name: 'Qiita タグ別記事ビューア',
         icons: [
           {
             src: '/icon-192x192.png',
             sizes: '192x192',
-            type: 'image/png',
-          },
-          {
-            src: '/icon-256x256.png',
-            sizes: '256x256',
             type: 'image/png',
           },
           {
