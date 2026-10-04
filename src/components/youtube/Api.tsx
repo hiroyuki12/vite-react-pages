@@ -3,13 +3,17 @@ import React, { useState, useEffect } from "react";
 const YOUTUBE_SERACH_API_URI = "https://www.googleapis.com/youtube/v3/search?";
 const API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
 
+type YoutubeSearchResponse = {
+  items?: { id: { videoId: string } }[];
+};
+
 const Api = () => {
   const [videoId, setVideoId] = useState("");
 
   useEffect(() => {
     // クエリ文字列を定義する
     const params = {
-      key: API_KEY,
+      key: String(API_KEY),
       q: "ヒカキン", // 検索キーワード
       type: "video", // video,channel,playlistから選択できる
       maxResults: "1", // 結果の最大数
@@ -19,7 +23,7 @@ const Api = () => {
 
     // APIをコールする
     fetch(YOUTUBE_SERACH_API_URI + queryParams)
-      .then((res) => res.json())
+      .then((res) => res.json() as Promise<YoutubeSearchResponse>)
       .then(
         (result) => {
           console.log("API success:", result);
@@ -29,7 +33,7 @@ const Api = () => {
             setVideoId(firstItem.id.videoId);
           }
         },
-        (error) => {
+        (error: unknown) => {
           console.error(error);
         }
       );

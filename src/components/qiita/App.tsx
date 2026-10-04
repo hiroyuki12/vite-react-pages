@@ -8,12 +8,47 @@ import './QiitaApp.css';
 // 一番下とみなす余裕(px)。高DPI環境で scrollTop が小数になるため完全一致では判定しない
 const SCROLL_THRESHOLD = 100;
 
+type QiitaTag = {
+  name: string;
+};
+
+type QiitaUser = {
+  profile_image_url: string;
+  items_count: number;
+};
+
+type QiitaItem = {
+  id: string;
+  title: string;
+  url: string;
+  created_at: string;
+  likes_count: number;
+  tags: QiitaTag[];
+  user: QiitaUser;
+};
+
+type QiitaErrorResponse = {
+  message?: string;
+};
+
+// Qiita API のレスポンスを記事の配列に変換する。失敗時は Error を投げる
+const parseQiitaResponse = async (res: Response): Promise<QiitaItem[]> => {
+  const data: unknown = await res.json().catch(() => null);
+  if (!res.ok) {
+    throw new Error((data as QiitaErrorResponse | null)?.message ?? `HTTP ${res.status}`);
+  }
+  if (!Array.isArray(data)) {
+    throw new Error('Unexpected response from Qiita API');
+  }
+  return data as QiitaItem[];
+};
+
 function App() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
-  const [postsList, setPostsList] = useState([]);
+  const [postsList, setPostsList] = useState<QiitaItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [tag, setTag] = useState('React');
+  const [tag, setTag] = useState('ClaudeCode');
   const [error, setError] = useState('');
   // 同じタグ・ページを再クリックした時にも再取得させるためのキー
   const [reloadKey, setReloadKey] = useState(0);
@@ -53,20 +88,16 @@ function App() {
     setError('');
 
     fetch(url, { signal: controller.signal })
-      .then(async (res) => {
-        const data = await res.json().catch(() => null);
-        if (!res.ok) {
-          throw new Error(data?.message ?? `HTTP ${res.status}`);
-        }
-        return data;
+      .then(parseQiitaResponse)
+      .then((items) => {
+        // 中断後に解決した古い結果は反映しない
+        if (controller.signal.aborted) return;
+        setPostsList((prev) => prev.concat(items));
       })
-      .then((data) => {
-        setPostsList((prev) => prev.concat(data));
-      })
-      .catch((err) => {
+      .catch((err: unknown) => {
         // タグ切り替え等で中断したリクエストはエラー扱いしない
-        if (err.name === 'AbortError') return;
-        setError(err.message);
+        if (controller.signal.aborted) return;
+        setError(err instanceof Error ? err.message : String(err));
       })
       .finally(() => {
         if (!controller.signal.aborted) {
@@ -79,7 +110,7 @@ function App() {
     return () => controller.abort();
   }, [tag, page, perPage, reloadKey]);
 
-  const tagButtonClick = (target) => {
+  const tagButtonClick = (target: string) => {
     setPerPage(20);
     setPostsList([]);
     setPage(1);
@@ -87,20 +118,20 @@ function App() {
     setReloadKey((k) => k + 1);
   }
 
-  const pageButtonClick = (target) => {
+  const pageButtonClick = (target: string) => {
     setPerPage(100);
     setPostsList([]);
     setPage(parseInt(target, 10));
     setReloadKey((k) => k + 1);
   }
 
-  const renderTag = (list) => {
+  const renderTag = (list: QiitaTag[]) => {
     return list.map((item) => (
       <React.Fragment key={item.name}>{item.name}, </React.Fragment>
     ));
   }
 
-  const renderImageList = (list) => {
+  const renderImageList = (list: QiitaItem[]) => {
     const posts = list.map((item) => {
       return (
         <li className="item" key={item.id}>
@@ -129,20 +160,22 @@ function App() {
           <a className="QiitaApp-link" href="https://mbp.hatenablog.com/entry/2022/07/14/225626" target="_blank" rel="noreferrer">Vite で React 新規プロジェクトを作成</a><br />
           <h3>Qiitaで{tag}タグありの記事を表示</h3>
           <br />
-          <button onClick={() => {tagButtonClick("Codex")}}>Codex</button>
           <button onClick={() => {tagButtonClick("ClaudeCode")}}>ClaudeCode</button>
+          <button onClick={() => {tagButtonClick("Codex")}}>Codex</button>
           <button onClick={() => {tagButtonClick("Gemini")}}>Gemini</button>
+          <button onClick={() => {tagButtonClick("Antigravity")}}>Antigravity</button>
           <button onClick={() => {tagButtonClick("React")}}>React</button>
           <button onClick={() => {tagButtonClick("Next.js")}}>Next.js</button>
-          <button onClick={() => {tagButtonClick("Vue.js")}}>Vue.js</button>
-          <button onClick={() => {tagButtonClick("Nuxt.js")}}>Nuxt.js</button>
+          {/* <button onClick={() => {tagButtonClick("Vue.js")}}>Vue.js</button> */}
+          {/* <button onClick={() => {tagButtonClick("Nuxt.js")}}>Nuxt.js</button> */}
           <button onClick={() => {tagButtonClick("JavaScript")}}>JavaScript</button>
           <button onClick={() => {tagButtonClick("Swift")}}>Swift</button>
           <button onClick={() => {tagButtonClick("Vim")}}>Vim</button>
-          <button onClick={() => {tagButtonClick("Azure")}}>Azure</button>
-          <button onClick={() => {tagButtonClick("Aws")}}>AWS</button>
+          {/* <button onClick={() => {tagButtonClick("Azure")}}>Azure</button> */}
+          {/* <button onClick={() => {tagButtonClick("Aws")}}>AWS</button> */}
           <button onClick={() => {tagButtonClick(".NET")}}>.NET</button>
-          <button onClick={() => {tagButtonClick("Flutter")}}>Flutter</button>
+          {/* <button onClick={() => {tagButtonClick("Flutter")}}>Flutter</button> */}
+          <button onClick={() => {tagButtonClick("Cloudflare")}}>Cloudflare</button>
           {tag}<br />
           page:<button onClick={() => {pageButtonClick("1")}}>__1__</button>
           ___:<button onClick={() => {pageButtonClick("20")}}>__20__</button>
