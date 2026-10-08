@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import throttle from 'lodash/throttle';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 import './QiitaApp.css';
 
-// 一番下とみなす余裕(px)。高DPI環境で scrollTop が小数になるため完全一致では判定しない
+// 一番下とみなす余裕(px)。番兵要素がこの距離まで近づいたら次ページを取得する
 const SCROLL_THRESHOLD = 100;
 
 // タグ一覧の定義（非表示対象はコメントアウトで保持）
@@ -28,6 +27,24 @@ const TAG_LIST = [
   { id: 'Cloudflare', label: 'Cloudflare' },
 ];
 
+// 記事1件分。追加読み込み時に既存の記事を再描画しないよう memo 化
+const PostItem = memo(function PostItem({ item }) {
+  return (
+    <li className="item">
+      <div className="card-container">
+        <img src={item.user.profile_image_url} width="54" height="54" loading="lazy" alt="" />
+        <div className="card-text">
+          <a className="QiitaApp-link" href={item.url} target="_blank" rel="noreferrer">{item.title}</a>
+          <div className="card-text2">
+            <p>{dayjs(item.created_at).fromNow(true)}
+               / {item.tags.map((t) => `${t.name}, `).join('')} / {item.likes_count}likes / {item.user.items_count}posts</p>
+          </div>
+        </div>
+      </div>
+    </li>
+  );
+});
+
 function App() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
@@ -35,36 +52,33 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [tag, setTag] = useState('ClaudeCode');
   const [error, setError] = useState('');
-  // 同じタグ・ページを再クリックした時にも再取得させるためのキー
+  // 同じタグ・ページを再クリックした時やリトライ時にも再取得させるためのキー
   const [reloadKey, setReloadKey] = useState(0);
   // スクロール追加取得可能かどうかのフラグ
   const [hasMore, setHasMore] = useState(true);
-  // スクロールハンドラから最新の読み込み状態および hasMore を参照するため ref で保持
+  // 番兵の通知から同期的に読み込み中かを判定するため ref でも保持(多重にページを進めない)
   const isLoadingRef = useRef(false);
-  const hasMoreRef = useRef(true);
+  // リスト末尾の番兵要素。画面内に入ったら次ページを取得する
+  const sentinelRef = useRef(null);
 
-  // 一番下に到達したらページを更新
+  // 番兵が見えたらページを更新。
+  // 読み込み完了のたびに observer を張り直すので、1ページ目が画面より短く
+  // スクロールできない場合でも続きを自動で取得できる
   useEffect(() => {
-    const handleScroll = throttle(() => {
-      if (isLoadingRef.current || !hasMoreRef.current) {
-        return;
-      }
-      const { scrollTop, offsetHeight } = document.documentElement;
-      if (window.innerHeight + scrollTop < offsetHeight - SCROLL_THRESHOLD) {
-        return;
-      }
+    if (isLoading || !hasMore || error) return;
+    const el = sentinelRef.current;
+    if (!el) return;
 
-      // 一番下に到達した時の処理
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries[0].isIntersecting || isLoadingRef.current) return;
+      observer.disconnect();
+      isLoadingRef.current = true;
       setPage((prevCount) => prevCount + 1);
-    }, 500);
+    }, { rootMargin: `0px 0px ${SCROLL_THRESHOLD}px 0px` });
+    observer.observe(el);
 
-    window.addEventListener('scroll', handleScroll);
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      handleScroll.cancel();
-    };
-  }, []);
+    return () => observer.disconnect();
+  }, [isLoading, hasMore, error]);
 
   // tag / page / perPage が変化した時に記事を取得
   useEffect(() => {
@@ -81,18 +95,25 @@ function App() {
         if (!res.ok) {
           throw new Error(data?.message ?? `HTTP ${res.status}`);
         }
+        if (!Array.isArray(data)) {
+          throw new Error('Unexpected response from Qiita API');
+        }
         return data;
       })
       .then((data) => {
-        setPostsList((prev) => prev.concat(data));
-        // 取得結果が 0 件または perPage より少なければ追加データなし
-        const more = Boolean(data && data.length >= perPage);
-        setHasMore(more);
-        hasMoreRef.current = more;
+        // 中断後に本文の読み込みが終わった場合は古い結果なので捨てる
+        if (controller.signal.aborted) return;
+        // 取得中に新着記事が増えるとページ境界がずれて同じ記事が再度返るため id で重複を除く
+        setPostsList((prev) => {
+          const seen = new Set(prev.map((p) => p.id));
+          return prev.concat(data.filter((p) => !seen.has(p.id)));
+        });
+        // 取得結果が perPage より少なければ追加データなし
+        setHasMore(data.length >= perPage);
       })
       .catch((err) => {
         // タグ切り替え等で中断したリクエストはエラー扱いしない
-        if (err.name === 'AbortError') return;
+        if (controller.signal.aborted || err.name === 'AbortError') return;
         setError(err.message);
       })
       .finally(() => {
@@ -112,50 +133,33 @@ function App() {
     setPage(1);
     setTag(target);
     setHasMore(true);
-    hasMoreRef.current = true;
     setReloadKey((k) => k + 1);
   }
 
   const pageButtonClick = (target) => {
     setPerPage(100);
     setPostsList([]);
-    setPage(parseInt(target, 10));
+    setPage(target);
     setHasMore(true);
-    hasMoreRef.current = true;
     setReloadKey((k) => k + 1);
   }
 
-  const renderTag = (list) => {
-    return list.map((item) => (
-      <React.Fragment key={item.name}>{item.name}, </React.Fragment>
-    ));
-  }
-
-  const renderImageList = (list) => {
-    const posts = list.map((item) => {
-      return (
-        <li className="item" key={item.id}>
-          <div className="card-container">
-            <img src={item.user.profile_image_url} width="54" height="54" loading="lazy" alt="" />
-            <div className="card-text">
-              <a className="QiitaApp-link" href={item.url} target="_blank" rel="noreferrer">{item.title}</a>
-              <div className="card-text2">
-                <p>{dayjs(item.created_at).fromNow(true)}
-                   / {renderTag(item.tags)} / {item.likes_count}likes / {item.user.items_count}posts</p>
-              </div>
-            </div>
-          </div>
-        </li>
-      );
-    });
-    return posts;
+  // 失敗したページをもう一度取得する(ページは進めない)
+  const retry = () => {
+    setReloadKey((k) => k + 1);
   }
 
   // 表示されるHTMLを記述
     return (
       <div className="App">
         <header className="QiitaApp-header">
-          <span style={{ color: 'red', fontWeight: 'bold' }}>{error}</span><br />
+          {error && (
+            <>
+              <span role="alert" style={{ color: 'red', fontWeight: 'bold' }}>{error}</span>
+              {' '}<button onClick={retry}>Retry</button>
+              <br />
+            </>
+          )}
           <a className="QiitaApp-link" href="https://mbp.hatenablog.com/entry/2022/07/16/103717" target="_blank" rel="noreferrer">netlifyとVercelでVite React App、QiitaAPIから記事情報を取得して表示(vite-react-pages)</a><br />
           <a className="QiitaApp-link" href="https://mbp.hatenablog.com/entry/2022/07/14/225626" target="_blank" rel="noreferrer">Vite で React 新規プロジェクトを作成</a><br />
           <h3>Qiita で{tag}タグありの記事を表示</h3>
@@ -171,15 +175,18 @@ function App() {
           ))}
           <br />
           {tag}<br />
-          page:<button onClick={() => {pageButtonClick("1")}}>__1__</button>
-          ___:<button onClick={() => {pageButtonClick("20")}}>__20__</button>
-          ___:<button onClick={() => {pageButtonClick("50")}}>__50__</button>
-          ___:<button onClick={() => {pageButtonClick("90")}}>__90</button>
+          page:<button onClick={() => {pageButtonClick(1)}}>__1__</button>
+          ___:<button onClick={() => {pageButtonClick(20)}}>__20__</button>
+          ___:<button onClick={() => {pageButtonClick(50)}}>__50__</button>
+          ___:<button onClick={() => {pageButtonClick(90)}}>__90</button>
           {page}/{perPage}posts
         </header>
 
         <main className="QiitaApp-main">
-          <ul>{renderImageList(postsList)}</ul>
+          <ul>
+            {postsList.map((item) => <PostItem key={item.id} item={item} />)}
+          </ul>
+          <div ref={sentinelRef} aria-hidden="true" />
 
           <div className="QiitaApp-status">
             Page {page}, tag {tag}

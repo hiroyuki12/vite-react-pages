@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const YOUTUBE_SERACH_API_URI = "https://www.googleapis.com/youtube/v3/search?";
+const YOUTUBE_SEARCH_API_URI = "https://www.googleapis.com/youtube/v3/search?";
 const API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
 
 const Api = () => {
@@ -18,7 +18,8 @@ const Api = () => {
     const queryParams = new URLSearchParams(params);
 
     // APIをコールする
-    fetch(YOUTUBE_SERACH_API_URI + queryParams)
+    const controller = new AbortController();
+    fetch(YOUTUBE_SEARCH_API_URI + queryParams, { signal: controller.signal })
       .then((res) => res.json())
       .then(
         (result) => {
@@ -30,10 +31,14 @@ const Api = () => {
           }
         },
         (error) => {
-          console.error(error);
+          if (error.name !== "AbortError") console.error(error);
         }
       );
+    return () => controller.abort();
   }, []);
+
+  // 動画IDが決まるまでは iframe を出さない(空IDの embed URL を読み込まない)
+  if (!videoId) return null;
 
   return (
     <iframe
